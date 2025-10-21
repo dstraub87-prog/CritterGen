@@ -1,0 +1,92 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Creature Generator</title>
+<style>
+  body {
+    font-family: 'Trebuchet MS', sans-serif;
+    background: radial-gradient(circle at top, #1e1e2e 0%, #0d0d14 80%);
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { color: #80c0ff; text-shadow: 0 0 10px #3080ff; }
+  #prompt { width: 90%; max-width: 400px; padding: 8px; font-size: 1em; }
+  #generate, #save {
+    margin: 12px; padding: 10px 20px;
+    background: linear-gradient(90deg,#3080ff,#60ffbf);
+    border: none; border-radius: 6px; color: #000; font-weight: bold;
+    cursor: pointer;
+  }
+  #generate:hover, #save:hover { opacity: 0.8; }
+  #output {
+    margin-top: 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  #creature {
+    width: 512px; max-width: 90%; border-radius: 10px;
+    box-shadow: 0 0 15px rgba(80,200,255,0.5);
+    background: #111;
+  }
+  footer {
+    margin-top: 30px; font-size: 0.8em; opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+  <h1>🧬 Creature Generator</h1>
+  <p>Describe your Pokémon-like creature idea below:</p>
+  <input id="prompt" placeholder="e.g. fiery dragon-lion hybrid with crystals" />
+  <br />
+  <button id="generate">Generate Creature</button>
+  <button id="save" style="display:none;">Save PNG</button>
+  <div id="output"></div>
+  <footer>100% Free | Uses open diffusion mirror | v1.2</footer>
+
+<script>
+const genBtn = document.getElementById('generate');
+const saveBtn = document.getElementById('save');
+const output = document.getElementById('output');
+
+genBtn.onclick = async () => {
+  const idea = document.getElementById('prompt').value.trim();
+  if (!idea) return alert('Enter a creature idea first!');
+  output.innerHTML = `<p>Generating your creature... this takes ~10s</p>`;
+  saveBtn.style.display = 'none';
+
+  const prompt = `fantasy creature concept art, ${idea}, cute but powerful, detailed lighting, digital art, trending on artstation, transparent background`;
+
+  try {
+    // Totally free mirror endpoint (no API key)
+    const url = "https://image.pollinations.ai/prompt/" + encodeURIComponent(prompt);
+    const img = document.createElement('img');
+    img.id = "creature";
+    img.crossOrigin = "anonymous";
+    img.src = url + "?seed=" + Math.floor(Math.random() * 100000);
+    img.onload = () => {
+      output.innerHTML = "";
+      output.appendChild(img);
+      saveBtn.style.display = 'inline-block';
+    };
+    img.onerror = () => {
+      output.innerHTML = "<p>⚠️ Generation failed. Try a different prompt or refresh.</p>";
+    };
+  } catch (err) {
+    output.innerHTML = `<p>Error: ${err.message}</p>`;
+  }
+};
+
+saveBtn.onclick = () => {
+  const img = document.getElementById('creature');
+  if (!img) return;
+  const link = document.createElement('a');
+  link.download = 'creature.png';
+  link.href = img.src;
+  link.click();
+};
+</script>
+</body>
+</html>
